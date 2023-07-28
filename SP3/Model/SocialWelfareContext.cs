@@ -19,12 +19,13 @@ public partial class SocialWelfareContext : DbContext
 
     public virtual DbSet<NeedyBankDetail> NeedyBankDetails { get; set; }
 
+    public virtual DbSet<NewsLetter> NewsLetters { get; set; }
+
     public virtual DbSet<PersonalDetail> PersonalDetails { get; set; }
 
     public virtual DbSet<UserDocument> UserDocuments { get; set; }
 
     public virtual DbSet<UserRegistry> UserRegistries { get; set; }
-
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
@@ -99,6 +100,19 @@ public partial class SocialWelfareContext : DbContext
             entity.HasOne(d => d.CnicNavigation).WithMany(p => p.NeedyBankDetails)
                 .HasForeignKey(d => d.Cnic)
                 .HasConstraintName("FK__needy_bank__cnic__534D60F1");
+        });
+
+        modelBuilder.Entity<NewsLetter>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__news_let__3214EC27E34BB9E5");
+
+            entity.ToTable("news_letters");
+
+            entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.Email)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("email");
         });
 
         modelBuilder.Entity<PersonalDetail>(entity =>
