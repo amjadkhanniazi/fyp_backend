@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using SP3.Model;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +32,6 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 {
     build.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
 }));
-
 
 var app = builder.Build();
 

@@ -538,3 +538,9 @@ D:\GitHub\FYP_BackEnd\SP3\obj\Debug\net6.0\refint\SP3.dll
 D:\GitHub\FYP_BackEnd\SP3\obj\Debug\net6.0\SP3.pdb
 D:\GitHub\FYP_BackEnd\SP3\obj\Debug\net6.0\SP3.genruntimeconfig.cache
 D:\GitHub\FYP_BackEnd\SP3\obj\Debug\net6.0\ref\SP3.dll
+D:\GitHub\FYP_BackEnd\SP3\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\GitHub\FYP_BackEnd\SP3\bin\Debug\net6.0\Microsoft.AspNetCore.Cryptography.Internal.dll
+D:\GitHub\FYP_BackEnd\SP3\bin\Debug\net6.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+D:\GitHub\FYP_BackEnd\SP3\bin\Debug\net6.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+D:\GitHub\FYP_BackEnd\SP3\bin\Debug\net6.0\Microsoft.Extensions.Identity.Core.dll
+D:\GitHub\FYP_BackEnd\SP3\bin\Debug\net6.0\Microsoft.Extensions.Identity.Stores.dll

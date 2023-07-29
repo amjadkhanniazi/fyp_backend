@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SP3.Model;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace SP3.Controllers
 {
@@ -108,6 +112,33 @@ namespace SP3.Controllers
 
             return CreatedAtAction("GetUserRegistry", new { id = userRegistry.Cnic }, userRegistry);
         }
+
+        //User Login Function Goes here
+
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginRequest model)
+        {
+            // Find the user in the database based on the provided username
+            var user = await _context.UserRegistries.FirstOrDefaultAsync(u => u.Cnic == model.Cnic);
+
+            // Check if the user exists and the provided password matches the stored password
+            if (user == null || user.Password != model.Password)
+            {
+                return Unauthorized(new { message = "Invalid login attempt." });
+            }
+
+            // User authentication successful
+            // You can optionally sign the user in or issue a token here.
+
+            return Ok(new { message = "Login successful." });
+        }
+
+
+
+
+
+
 
         // DELETE: api/UserRegistries/5
         [HttpDelete("{id}")]
