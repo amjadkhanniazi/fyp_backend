@@ -6,13 +6,16 @@ namespace SP3.Model;
 
 public partial class SocialWelfareContext : DbContext
 {
+    private readonly IConfiguration _configuration;
     public SocialWelfareContext()
     {
+        
     }
 
-    public SocialWelfareContext(DbContextOptions<SocialWelfareContext> options)
+    public SocialWelfareContext(DbContextOptions<SocialWelfareContext> options, IConfiguration configuration)
         : base(options)
     {
+        _configuration = configuration;
     }
 
     public virtual DbSet<Addre> Addres { get; set; }
@@ -28,8 +31,7 @@ public partial class SocialWelfareContext : DbContext
     public virtual DbSet<UserRegistry> UserRegistries { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=34.122.17.201;Initial Catalog=Social_Welfare;Persist Security Info=True;User ID=sqlserver;Password=sqlserver; TrustServerCertificate=True");
+        => optionsBuilder.UseSqlServer(_configuration.GetConnectionString("Constr"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
