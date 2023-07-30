@@ -24,6 +24,30 @@ namespace SP3.Controllers
             _context = context;
         }
 
+        //checking if email already exist in the database
+        [HttpGet("check-email")]
+        public async Task<IActionResult> CheckEmailExistence(string email)
+        {
+            var existingEmail = await _context.UserRegistries
+                .Where(u => u.Email == email)
+                .AnyAsync();
+
+            return Ok(new { exists = existingEmail });
+        }
+
+        //Checking if CNIC already exists
+        [HttpGet("check-cnic")]
+        public async Task<IActionResult> CheckCnicExistence(long cnic)
+        {
+            var existingCnic = await _context.UserRegistries
+                .Where(u => u.Cnic == cnic)
+                .AnyAsync();
+
+            return Ok(new { exists = existingCnic });
+        }
+
+
+
         // GET: api/UserRegistries
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserRegistry>>> GetUserRegistries()
