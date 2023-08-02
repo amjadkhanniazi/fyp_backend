@@ -7,9 +7,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SP3.Model;
+using Microsoft.Extensions.Options;
+using BCrypt.Net;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using SP3;
 
 namespace SP3.Controllers
 {
@@ -18,10 +25,12 @@ namespace SP3.Controllers
     public class UserRegistriesController : ControllerBase
     {
         private readonly SocialWelfareContext _context;
+        private readonly JwtSettings jwtSettings;
 
-        public UserRegistriesController(SocialWelfareContext context)
+        public UserRegistriesController(SocialWelfareContext context, IOptions<JwtSettings> options)
         {
-            _context = context;
+            this._context = context;
+            this.jwtSettings = options.Value;
         }
 
         //checking if email already exist in the database
@@ -117,6 +126,8 @@ namespace SP3.Controllers
           {
               return Problem("Entity set 'SocialWelfareContext.UserRegistries'  is null.");
           }
+            string hashedpassword = BCrypt.Net.BCrypt.HashPassword(userRegistry.Password);
+            userRegistry.Password=hashedpassword;
             _context.UserRegistries.Add(userRegistry);
             try
             {
@@ -145,24 +156,38 @@ namespace SP3.Controllers
         {
             // Find the user in the database based on the provided username
             var user = await _context.UserRegistries.FirstOrDefaultAsync(u => u.Cnic == model.Cnic);
-
+           
+            
             // Check if the user exists and the provided password matches the stored password
-            if (user == null || user.Password != model.Password)
+            
+            if (user != null)
             {
-                return Unauthorized(new { message = "Invalid login attempt." });
+                bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, hash: user.Password);
+                if (isPasswordValid)
+                {
+                   // var token = GenerateJwtToken(model.Cnic.ToString());
+                    return Ok(new { message="Login successful." });
+                }
             }
 
-            // User authentication successful
-            // You can optionally sign the user in or issue a token here.
 
-            return Ok(new { message = "Login successful." });
+            return Ok(new { message = "Login Unsuccessful."});
+
         }
+       /* private string GenerateJwtToken(string username)
+        {
+            var key = Encoding.UTF8.GetBytes("4zA7k@L$8vQg&hRb3XpYwSs9nN!+2C6TtZg*UcFfEaGmJjKsNzP"); // Replace with your secret key for JWT
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] { new Claim("username", username) }),
+                Expires = DateTime.UtcNow.AddHours(1), // Token expiration time
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
 
-
-
-
-
-
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }*/
 
         // DELETE: api/UserRegistries/5
         [HttpDelete("{id}")]
@@ -188,5 +213,11 @@ namespace SP3.Controllers
         {
             return (_context.UserRegistries?.Any(e => e.Cnic == id)).GetValueOrDefault();
         }
+
+
+        
     }
 }
+
+
+

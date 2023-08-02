@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SP3;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,27 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 {
     build.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
 }));
+
+// Add authentication using JWT
+
+/*var _authkey = builder.Configuration.GetValue<string>("JwtSettings:securitykey");
+builder.Services.AddAuthentication(item =>
+{
+    item.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    item.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(item =>
+{
+    item.RequireHttpsMetadata = true;
+    item.SaveToken = false;
+    var tokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authkey))
+    };
+    item.TokenValidationParameters = tokenValidationParameters;
+});
+var _jwtsettings = builder.Configuration.GetSection("JwtSettings");*/
+//builder.Services.Configure<JwtSettings>(_jwtsettings);
 
 var app = builder.Build();
 
