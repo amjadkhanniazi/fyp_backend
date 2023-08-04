@@ -12,7 +12,7 @@ namespace SP3.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    
+    [Authorize]
     public class NeedyBankDetailsController : ControllerBase
     {
         private readonly SocialWelfareContext _context;

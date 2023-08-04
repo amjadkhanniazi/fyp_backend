@@ -35,25 +35,29 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 }));
 
 // Add authentication using JWT
-
-/*var _authkey = builder.Configuration.GetValue<string>("JwtSettings:securitykey");
-builder.Services.AddAuthentication(item =>
+builder.Services.AddAuthentication(options =>
 {
-    item.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    item.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(item =>
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(o =>
 {
-    item.RequireHttpsMetadata = true;
-    item.SaveToken = false;
-    var tokenValidationParameters = new TokenValidationParameters
+    o.TokenValidationParameters = new TokenValidationParameters
     {
+        //ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        //ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey
+            (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authkey))
+        ClockSkew=TimeSpan.Zero
     };
-    item.TokenValidationParameters = tokenValidationParameters;
 });
-var _jwtsettings = builder.Configuration.GetSection("JwtSettings");*/
-//builder.Services.Configure<JwtSettings>(_jwtsettings);
+builder.Services.AddAuthorization();
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -67,7 +71,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("corspolicy");
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

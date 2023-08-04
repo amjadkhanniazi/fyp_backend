@@ -25,12 +25,13 @@ namespace SP3.Controllers
     public class UserRegistriesController : ControllerBase
     {
         private readonly SocialWelfareContext _context;
-        private readonly JwtSettings jwtSettings;
+        private readonly IConfiguration _configuration;
 
-        public UserRegistriesController(SocialWelfareContext context, IOptions<JwtSettings> options)
+
+        public UserRegistriesController(SocialWelfareContext context, IConfiguration configuration)
         {
             this._context = context;
-            this.jwtSettings = options.Value;
+            _configuration = configuration;
         }
 
         //checking if email already exist in the database
@@ -165,8 +166,8 @@ namespace SP3.Controllers
                 bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, hash: user.Password);
                 if (isPasswordValid)
                 {
-                   // var token = GenerateJwtToken(model.Cnic.ToString());
-                    return Ok(new { message="Login successful." });
+                    var token = GenerateJwtToken(model.Cnic.ToString());
+                    return Ok(new {token});
                 }
             }
 
@@ -174,20 +175,21 @@ namespace SP3.Controllers
             return Ok(new { message = "Login Unsuccessful."});
 
         }
-       /* private string GenerateJwtToken(string username)
+        private string GenerateJwtToken(string username)
         {
-            var key = Encoding.UTF8.GetBytes("4zA7k@L$8vQg&hRb3XpYwSs9nN!+2C6TtZg*UcFfEaGmJjKsNzP"); // Replace with your secret key for JWT
+            string secretKey = _configuration.GetSection("Jwt:Key").Value;
+            var key = Encoding.UTF8.GetBytes(secretKey);
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("username", username) }),
-                Expires = DateTime.UtcNow.AddHours(1), // Token expiration time
+                Expires = DateTime.UtcNow.AddSeconds(20), // Token expiration time
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
-        }*/
+        }
 
         // DELETE: api/UserRegistries/5
         [HttpDelete("{id}")]
