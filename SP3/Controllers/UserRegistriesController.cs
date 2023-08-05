@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using SP3;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SP3.Controllers
 {
@@ -60,6 +61,7 @@ namespace SP3.Controllers
 
         // GET: api/UserRegistries
         [HttpGet]
+        
         public async Task<ActionResult<IEnumerable<UserRegistry>>> GetUserRegistries()
         {
           if (_context.UserRegistries == null)
@@ -71,6 +73,7 @@ namespace SP3.Controllers
 
         // GET: api/UserRegistries/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<UserRegistry>> GetUserRegistry(long id)
         {
           if (_context.UserRegistries == null)
@@ -90,14 +93,25 @@ namespace SP3.Controllers
         // PUT: api/UserRegistries/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutUserRegistry(long id, UserRegistry userRegistry)
         {
-            if (id != userRegistry.Cnic)
+            var existingUserRegistry = await _context.UserRegistries.FindAsync(id);
+            if (id != existingUserRegistry.Cnic)
             {
                 return BadRequest();
             }
+            if (existingUserRegistry.Name != userRegistry.Name)
+            {
+                existingUserRegistry.Name = userRegistry.Name;
+            }
+            if (!string.IsNullOrWhiteSpace(userRegistry.Password))
+            {
+                // Hash the new password using bcrypt
+                existingUserRegistry.Password = BCrypt.Net.BCrypt.HashPassword(userRegistry.Password);
+            }
 
-            _context.Entry(userRegistry).State = EntityState.Modified;
+            _context.Entry(existingUserRegistry).State = EntityState.Modified;
 
             try
             {
@@ -172,7 +186,7 @@ namespace SP3.Controllers
             }
 
 
-            return Ok(new { message = "Login Unsuccessful."});
+            return Unauthorized(new { message = "Login Unsuccessful."});
 
         }
         private string GenerateJwtToken(string username)
@@ -183,7 +197,7 @@ namespace SP3.Controllers
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("username", username) }),
-                Expires = DateTime.UtcNow.AddSeconds(20), // Token expiration time
+                Expires = DateTime.UtcNow.AddMinutes(20), // Token expiration time
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -193,6 +207,7 @@ namespace SP3.Controllers
 
         // DELETE: api/UserRegistries/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteUserRegistry(long id)
         {
             if (_context.UserRegistries == null)
