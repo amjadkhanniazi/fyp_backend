@@ -37,7 +37,7 @@ builder.Services.AddDbContext<SocialWelfareContext>(options =>
 // Default Policy
 builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 {
-    build.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
+    build.WithOrigins("http://localhost:3000", "https://fypfront.azurewebsites.net").AllowAnyMethod().AllowAnyHeader();
 }));
 
 // Add authentication using JWT
