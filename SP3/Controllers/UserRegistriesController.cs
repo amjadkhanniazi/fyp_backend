@@ -96,20 +96,21 @@ namespace SP3.Controllers
         [Authorize]
         public async Task<IActionResult> PutUserRegistry(long id, UserRegistry userRegistry)
         {
-            var existingUserRegistry = await _context.UserRegistries.FindAsync(id);
-            if (id != existingUserRegistry.Cnic)
+            if (id != userRegistry.Cnic)
             {
                 return BadRequest();
             }
-            if (existingUserRegistry.Name != userRegistry.Name)
+
+            var existingUserRegistry = await _context.UserRegistries.FindAsync(id);
+
+            if (existingUserRegistry == null)
             {
-                existingUserRegistry.Name = userRegistry.Name;
+                return NotFound();
             }
-            if (!string.IsNullOrWhiteSpace(userRegistry.Password))
-            {
-                // Hash the new password using bcrypt
-                existingUserRegistry.Password = BCrypt.Net.BCrypt.HashPassword(userRegistry.Password);
-            }
+
+            // Update non-password related fields of the userRegistry object
+            existingUserRegistry.Name = userRegistry.Name;
+            // Update other fields here
 
             _context.Entry(existingUserRegistry).State = EntityState.Modified;
 
@@ -129,8 +130,32 @@ namespace SP3.Controllers
                 }
             }
 
+            return Ok(new {message="success"});
+        }
+
+        // PUT: api/UserRegistries/5/ChangePassword
+        [HttpPut("{id}/ChangePassword")]
+        public async Task<IActionResult> ChangePassword(long id, ChangePassword changePassword)
+        {
+            // Validate the input, perform authentication checks, etc.
+
+            var userRegistry = await _context.UserRegistries.FindAsync(id);
+
+            if (userRegistry == null)
+            {
+                return NotFound();
+            }
+
+            // Update the password hash
+            userRegistry.Password = BCrypt.Net.BCrypt.HashPassword(changePassword.NewPassword);
+
+            _context.Entry(userRegistry).Property(u => u.Password).IsModified = true;
+
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
+
 
         // POST: api/UserRegistries
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
