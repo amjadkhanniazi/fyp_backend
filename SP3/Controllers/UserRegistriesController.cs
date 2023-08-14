@@ -61,7 +61,7 @@ namespace SP3.Controllers
 
         // GET: api/UserRegistries
         [HttpGet]
-        
+        [Authorize]
         public async Task<ActionResult<IEnumerable<UserRegistry>>> GetUserRegistries()
         {
           if (_context.UserRegistries == null)
@@ -231,6 +231,7 @@ namespace SP3.Controllers
         }
 
         // DELETE: api/UserRegistries/5
+        [Authorize]
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteUserRegistry(long id)
