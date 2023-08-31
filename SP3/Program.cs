@@ -25,12 +25,9 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
 
-
+//Connection String Call here
 builder.Services.AddDbContext<SocialWelfareContext>(options =>
 {
-    //the change occurs here.
-    //builder.cofiguration and not just configuration
-
     options.UseSqlServer(builder.Configuration.GetConnectionString("Constr"));
 });
 
@@ -50,8 +47,6 @@ builder.Services.AddAuthentication(options =>
 {
     o.TokenValidationParameters = new TokenValidationParameters
     {
-        //ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        //ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey
             (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
         ValidateIssuer = false,

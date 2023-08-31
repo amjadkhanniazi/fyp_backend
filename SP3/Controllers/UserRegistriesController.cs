@@ -91,7 +91,6 @@ namespace SP3.Controllers
         }
 
         // PUT: api/UserRegistries/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> PutUserRegistry(long id, UserRegistry userRegistry)
@@ -110,7 +109,6 @@ namespace SP3.Controllers
 
             // Update non-password related fields of the userRegistry object
             existingUserRegistry.Name = userRegistry.Name;
-            // Update other fields here
 
             _context.Entry(existingUserRegistry).State = EntityState.Modified;
 
@@ -137,7 +135,7 @@ namespace SP3.Controllers
         [HttpPut("{id}/ChangePassword")]
         public async Task<IActionResult> ChangePassword(long id, ChangePassword changePassword)
         {
-            // Validate the input, perform authentication checks, etc.
+           
 
             var userRegistry = await _context.UserRegistries.FindAsync(id);
 
@@ -158,7 +156,6 @@ namespace SP3.Controllers
 
 
         // POST: api/UserRegistries
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<UserRegistry>> PostUserRegistry(UserRegistry userRegistry)
         {
@@ -222,7 +219,7 @@ namespace SP3.Controllers
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("username", username) }),
-                Expires = DateTime.UtcNow.AddMinutes(20), // Token expiration time
+                Expires = DateTime.UtcNow.AddHours(24), // Token expiration time
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
